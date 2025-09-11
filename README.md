@@ -2,9 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Official Alibaba Cloud Model Studio Integration for ComfyUI
 
-A custom node for ComfyUI that provides **seamless integration** with the **Qwen-Image multimodal models** from **Alibaba Cloud Model Studio**. This enterprise-grade solution delivers cutting-edge image generation and editing capabilities directly within ComfyUI.
+A custom node for ComfyUI that provides **seamless integration** with the **Qwen-Image multimodal models** from **Alibaba Cloud Model Studio**. This solution delivers cutting-edge image generation and editing capabilities directly within ComfyUI.
 
 ### Why Choose Alibaba Cloud Model Studio?
 
