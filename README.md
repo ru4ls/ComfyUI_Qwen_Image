@@ -28,19 +28,42 @@ This is a direct integration with Alibaba Cloud's Model Studio service, not a th
 - Optional image masking for precise editing
 - Configurable parameters: seed, resolution, prompt extension, watermark, negative prompts
 - Both nodes now return the image URL in addition to the image tensor
+- Support for both international and mainland China API endpoints
+- Support for separate API keys for different regions
+- Clean, organized code structure with backward compatibility
+- Automatic environment variable loading from config directory
+- Industry-standard directory organization (core, config, generators)
 - Powered by Alibaba Cloud's advanced Qwen-Image models
 
 ## Installation
 
 1. Clone this repository to your ComfyUI custom nodes directory:
-   ```
+   ```bash
    cd ComfyUI/custom_nodes
    git clone https://github.com/ru4ls/ComfyUI_Qwen_Image.git
    ```
 
 2. Install the required dependencies:
-   ```
+   ```bash
    pip install -r ComfyUI_Qwen_Image/requirements.txt
+   ```
+
+3. The new clean module structure organizes the code into separate components:
+   ```
+   ComfyUI_Qwen_Image/
+   ├── __init__.py              # Main module entry point
+   ├── qwen_nodes.py           # Backward compatibility module
+   ├── qwen_image_nodes.py     # Legacy backward compatibility module
+   ├── config/                 # Configuration files
+   │   └── .env.template
+   ├── core/                   # Core API functionality
+   │   ├── __init__.py
+   │   └── api_base.py
+   ├── qwen_image/             # Generator modules
+   │   ├── __init__.py
+   │   ├── t2i_generator.py
+   │   └── i2i_generator.py
+   └── ...
    ```
 
 ## Setup
@@ -62,10 +85,32 @@ If you're using a workspace other than your default workspace, you may need to a
 
 ### Set Environment Variable
 
-Copy the `.env.template` file to `.env` in your ComfyUI root directory and replace the placeholder with your actual API key:
+You can set up your API keys in one of two ways:
+
+1. **Recommended approach**: Copy the `config/.env.template` file to `config/.env` and replace the placeholders with your actual API keys:
+   ```bash
+   cp config/.env.template config/.env
+   # Edit config/.env to add your API keys
+   ```
+
+2. **Alternative approach**: Copy the `config/.env.template` file to `.env` in the project root directory:
+   ```bash
+   cp config/.env.template .env
+   # Edit .env to add your API keys
+   ```
+
+For international endpoint only:
 ```
-DASHSCOPE_API_KEY=your_actual_api_key_here
+DASHSCOPE_API_KEY=your_international_api_key_here
 ```
+
+For both international and mainland China endpoints:
+```
+DASHSCOPE_API_KEY=your_international_api_key_here
+DASHSCOPE_API_KEY_CHINA=your_china_api_key_here
+```
+
+If you only provide `DASHSCOPE_API_KEY`, it will be used for both regions. If you provide both, the China-specific key will be used for the mainland China endpoint.
 
 ## Usage
 
@@ -95,6 +140,7 @@ DASHSCOPE_API_KEY=your_actual_api_key_here
 - **prompt_extend**: Enable intelligent prompt rewriting for better results
 - **seed**: Random seed for generation (0 for random)
 - **watermark**: Add Qwen-Image watermark to output
+- **region**: Select API endpoint (international or mainland_china)
 - **Outputs**: IMAGE (tensor), URL (string)
 
 ### Image-to-Image Editor
@@ -103,26 +149,55 @@ DASHSCOPE_API_KEY=your_actual_api_key_here
 - **mask_image** (optional): Mask defining areas to edit
 - **negative_prompt**: Text describing content to avoid in the edited image
 - **watermark**: Add Qwen-Image watermark to output
+- **region**: Select API endpoint (international or mainland_china)
 - **Outputs**: IMAGE (tensor), URL (string)
 
 ## Examples
 
 ### Text-only Generation
-Prompt: "Generate an image of a cat"
+Prompt: "Generate an image of a dog"
 
-![Text-to-Image Example](media/ComfyUI_Qwen_Image-t2i-b.png)
+![Text-to-Image Example](media/ComfyUI_Qwen_Image-t2i.png)
 
 ### Image Editing with Mask
 Edit an existing image by applying a mask to specify which areas to modify:
-- Original Image: an image of a cat
+- Original Image: an image of a dog
 - Mask: None
-- Prompt: "the cat is wearing a yellow banana sweater"
+- Prompt: "the dog is wearing a red t-shirt and a retro glasses while eating the hamburger"
 
-![Image-to-Image Example](media/ComfyUI_Qwen_Image-i2i-b.png)
+![Image-to-Image Example](media/ComfyUI_Qwen_Image-i2i.png)
 
 ## Security
 
 The API key is loaded from the `DASHSCOPE_API_KEY` environment variable and never stored in files or code, following Alibaba Cloud security best practices.
+
+## Troubleshooting
+
+If you encounter issues with API key loading:
+
+1. **Verify your .env file location**: The system looks for `.env` files in the following order:
+   - `config/.env` (recommended location)
+   - `.env` in the project root directory
+   - Environment variables set in your system
+
+2. **Check your API key**: Ensure your API key is correctly set in the `.env` file and that it has access to the Qwen-Image models.
+
+3. **Run the environment test**: Use the provided `test_env_loading.py` script to diagnose environment variable loading issues:
+   ```bash
+   python test_env_loading.py
+   ```
+
+4. **Enable debug output**: The system provides detailed debug output during initialization to help diagnose issues.
+
+5. **Path issues**: If you're still having problems, verify that the directory structure is correct:
+   ```
+   ComfyUI_Qwen_Image/
+   ├── config/
+   │   └── .env
+   ├── core/
+   │   └── api_base.py
+   └── ...
+   ```
 
 ## License
 
