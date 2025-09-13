@@ -122,7 +122,8 @@ class QwenT2IGenerator(QwenAPIBase):
             }
         }
     
-    RETURN_TYPES = ("IMAGE",)
+    RETURN_TYPES = ("IMAGE", "STRING")
+    RETURN_NAMES = ("image", "url")
     FUNCTION = "generate"
     CATEGORY = "Ru4ls/QwenImage"
     
@@ -207,7 +208,7 @@ class QwenT2IGenerator(QwenAPIBase):
                         image_tensor = torch.from_numpy(np.array(image).astype(np.float32) / 255.0)
                         image_tensor = image_tensor.unsqueeze(0)  # Add batch dimension
                         
-                        return (image_tensor,)
+                        return (image_tensor, image_url)
                     else:
                         raise ValueError(f"Unexpected API response format: {result}")
                 else:
@@ -271,7 +272,8 @@ class QwenI2IGenerator(QwenAPIBase):
             }
         }
     
-    RETURN_TYPES = ("IMAGE",)
+    RETURN_TYPES = ("IMAGE", "STRING")
+    RETURN_NAMES = ("image", "url")
     FUNCTION = "edit"
     CATEGORY = "Ru4ls/QwenImage"
     
@@ -369,7 +371,7 @@ class QwenI2IGenerator(QwenAPIBase):
                         image_tensor = torch.from_numpy(np.array(image).astype(np.float32) / 255.0)
                         image_tensor = image_tensor.unsqueeze(0)  # Add batch dimension
                         
-                        return (image_tensor,)
+                        return (image_tensor, image_url)
                     else:
                         raise ValueError(f"Unexpected API response format: {result}")
                 else:

@@ -27,6 +27,7 @@ This is a direct integration with Alibaba Cloud's Model Studio service, not a th
 - Edit existing images based on text instructions I2I
 - Optional image masking for precise editing
 - Configurable parameters: seed, resolution, prompt extension, watermark, negative prompts
+- Both nodes now return the image URL in addition to the image tensor
 - Powered by Alibaba Cloud's advanced Qwen-Image models
 
 ## Installation
@@ -74,6 +75,7 @@ DASHSCOPE_API_KEY=your_actual_api_key_here
 2. Connect a text input with your prompt
 3. Configure parameters as needed (seed, resolution, etc.)
 4. Execute the node
+5. The node now outputs both the generated image and its URL
 
 ### Image-to-Image Editing
 
@@ -82,6 +84,7 @@ DASHSCOPE_API_KEY=your_actual_api_key_here
 3. Provide a text instruction for editing
 4. Optionally connect a mask image
 5. Execute the node
+6. The node now outputs both the edited image and its URL
 
 ## Node Parameters
 
@@ -92,6 +95,7 @@ DASHSCOPE_API_KEY=your_actual_api_key_here
 - **prompt_extend**: Enable intelligent prompt rewriting for better results
 - **seed**: Random seed for generation (0 for random)
 - **watermark**: Add Qwen-Image watermark to output
+- **Outputs**: IMAGE (tensor), URL (string)
 
 ### Image-to-Image Editor
 - **prompt** (required): Text instruction for editing the image
@@ -99,21 +103,22 @@ DASHSCOPE_API_KEY=your_actual_api_key_here
 - **mask_image** (optional): Mask defining areas to edit
 - **negative_prompt**: Text describing content to avoid in the edited image
 - **watermark**: Add Qwen-Image watermark to output
+- **Outputs**: IMAGE (tensor), URL (string)
 
 ## Examples
 
 ### Text-only Generation
-Prompt: "Generate an image of a dog swimming under the water"
+Prompt: "Generate an image of a cat"
 
-![Text-to-Image Example](media/ComfyUI_Qwen_Image-t2i.png)
+![Text-to-Image Example](media/ComfyUI_Qwen_Image-t2i-b.png)
 
 ### Image Editing with Mask
 Edit an existing image by applying a mask to specify which areas to modify:
-- Original Image: a dog swimming under the water
+- Original Image: an image of a cat
 - Mask: None
-- Prompt: "the dog is wearing scuba diving outfit and accessories"
+- Prompt: "the cat is wearing a yellow banana sweater"
 
-![Image-to-Image Example](media/ComfyUI_Qwen_Image-i2i.png)
+![Image-to-Image Example](media/ComfyUI_Qwen_Image-i2i-b.png)
 
 ## Security
 
