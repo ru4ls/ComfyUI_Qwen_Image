@@ -26,12 +26,11 @@ This is a direct integration with Alibaba Cloud's Model Studio service, not a th
 - Generate images from text T2I
 - Edit existing images based on text instructions I2I
 - Optional image masking for precise editing
-- Configurable parameters: seed, resolution, prompt extension, watermark, negative prompts
+- Configurable parameters: region, seed, resolution, prompt extension, watermark, negative prompts
 - Both nodes now return the image URL in addition to the image tensor
 - Support for both international and mainland China API endpoints
 - Support for separate API keys for different regions
-- Clean, organized code structure with backward compatibility
-- Automatic environment variable loading from config directory
+- Automatic environment region variable loading from config directory
 - Industry-standard directory organization (core, config, generators)
 - Powered by Alibaba Cloud's advanced Qwen-Image models
 
@@ -48,23 +47,6 @@ This is a direct integration with Alibaba Cloud's Model Studio service, not a th
    pip install -r ComfyUI_Qwen_Image/requirements.txt
    ```
 
-3. The new clean module structure organizes the code into separate components:
-   ```
-   ComfyUI_Qwen_Image/
-   ├── __init__.py              # Main module entry point
-   ├── qwen_nodes.py           # Backward compatibility module
-   ├── qwen_image_nodes.py     # Legacy backward compatibility module
-   ├── config/                 # Configuration files
-   │   └── .env.template
-   ├── core/                   # Core API functionality
-   │   ├── __init__.py
-   │   └── api_base.py
-   ├── qwen_image/             # Generator modules
-   │   ├── __init__.py
-   │   ├── t2i_generator.py
-   │   └── i2i_generator.py
-   └── ...
-   ```
 
 ## Setup
 
@@ -118,7 +100,7 @@ If you only provide `DASHSCOPE_API_KEY`, it will be used for both regions. If yo
 
 1. Add the "Qwen Text-to-Image Generator" node to your workflow
 2. Connect a text input with your prompt
-3. Configure parameters as needed (seed, resolution, etc.)
+3. Configure parameters as needed (size, seed, region, etc.)
 4. Execute the node
 5. The node now outputs both the generated image and its URL
 
@@ -126,7 +108,7 @@ If you only provide `DASHSCOPE_API_KEY`, it will be used for both regions. If yo
 
 1. Add the "Qwen Image-to-Image Editor" node to your workflow
 2. Connect an image input
-3. Provide a text instruction for editing
+3. Provide a text instruction for editing and set region
 4. Optionally connect a mask image
 5. Execute the node
 6. The node now outputs both the edited image and its URL
@@ -170,34 +152,6 @@ Edit an existing image by applying a mask to specify which areas to modify:
 ## Security
 
 The API key is loaded from the `DASHSCOPE_API_KEY` environment variable and never stored in files or code, following Alibaba Cloud security best practices.
-
-## Troubleshooting
-
-If you encounter issues with API key loading:
-
-1. **Verify your .env file location**: The system looks for `.env` files in the following order:
-   - `config/.env` (recommended location)
-   - `.env` in the project root directory
-   - Environment variables set in your system
-
-2. **Check your API key**: Ensure your API key is correctly set in the `.env` file and that it has access to the Qwen-Image models.
-
-3. **Run the environment test**: Use the provided `test_env_loading.py` script to diagnose environment variable loading issues:
-   ```bash
-   python test_env_loading.py
-   ```
-
-4. **Enable debug output**: The system provides detailed debug output during initialization to help diagnose issues.
-
-5. **Path issues**: If you're still having problems, verify that the directory structure is correct:
-   ```
-   ComfyUI_Qwen_Image/
-   ├── config/
-   │   └── .env
-   ├── core/
-   │   └── api_base.py
-   └── ...
-   ```
 
 ## License
 
