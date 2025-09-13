@@ -23,11 +23,15 @@ This is a direct integration with Alibaba Cloud's Model Studio service, not a th
 
 ## Features
 
-- Generate images from text T2I
-- Edit existing images based on text instructions I2I
+- Generate images from text (T2I)
+- Edit existing images based on text instructions (I2I)
 - Optional image masking for precise editing
 - Configurable parameters: seed, resolution, prompt extension, watermark, negative prompts
+- **Image URL output**: Both nodes now return the direct URL to the generated image
 - Powered by Alibaba Cloud's advanced Qwen-Image models
+- Well-organized codebase following Python best practices
+- Comprehensive error handling and logging
+- Extensive test coverage
 
 ## Installation
 
@@ -40,6 +44,11 @@ This is a direct integration with Alibaba Cloud's Model Studio service, not a th
 2. Install the required dependencies:
    ```
    pip install -r ComfyUI_Qwen_Image/requirements.txt
+   ```
+
+   Or for development dependencies:
+   ```
+   pip install -e .[dev]
    ```
 
 ## Setup
@@ -92,6 +101,7 @@ DASHSCOPE_API_KEY=your_actual_api_key_here
 - **prompt_extend**: Enable intelligent prompt rewriting for better results
 - **seed**: Random seed for generation (0 for random)
 - **watermark**: Add Qwen-Image watermark to output
+- **image_url** (output): Direct URL to the generated image
 
 ### Image-to-Image Editor
 - **prompt** (required): Text instruction for editing the image
@@ -99,6 +109,7 @@ DASHSCOPE_API_KEY=your_actual_api_key_here
 - **mask_image** (optional): Mask defining areas to edit
 - **negative_prompt**: Text describing content to avoid in the edited image
 - **watermark**: Add Qwen-Image watermark to output
+- **image_url** (output): Direct URL to the generated image
 
 ## Examples
 
@@ -114,6 +125,57 @@ Edit an existing image by applying a mask to specify which areas to modify:
 - Prompt: "the dog is wearing scuba diving outfit and accessories"
 
 ![Image-to-Image Example](media/ComfyUI_Qwen_Image-i2i.png)
+
+## Development
+
+This project follows modern Python packaging standards with a well-organized structure:
+
+```
+ComfyUI_Qwen_Image/
+├── qwen_image/           # Main package
+│   ├── api/              # API client and models
+│   │   └── client.py     # QwenAPIClient implementation
+│   ├── nodes/            # ComfyUI node implementations
+│   │   ├── t2i_generator.py  # Text-to-image generator node
+│   │   └── i2i_editor.py     # Image-to-image editor node
+│   ├── utils/            # Utility functions
+│   │   ├── config.py     # Configuration management
+│   │   └── image_utils.py# Image processing utilities
+│   └── exceptions.py     # Custom exceptions
+├── tests/                # Test suite
+├── requirements.txt      # Dependencies
+├── setup.py             # Package setup
+├── pyproject.toml       # Modern Python packaging
+└── README.md            # Documentation
+```
+
+### Running Tests
+
+To run the test suite:
+
+```
+pytest tests/
+```
+
+To run tests with coverage:
+
+```
+pytest tests/ --cov=qwen_image
+```
+
+### Code Quality
+
+To check code formatting:
+
+```
+flake8 qwen_image/
+```
+
+To automatically format code:
+
+```
+black qwen_image/
+```
 
 ## Security
 

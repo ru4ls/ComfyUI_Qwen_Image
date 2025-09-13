@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ComfyUI_Qwen_Image"
+version = "1.1.0"
+description = "A custom node for ComfyUI that integrates Qwen-Image models for text-to-image and image-to-image editing."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name = "ru4ls" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11"
+]
+dependencies = [
+    "requests>=2.28.0",
+    "Pillow>=9.0.0",
+    "torch>=1.13.0",
+    "numpy>=1.21.0",
+    "python-dotenv>=0.19.0"
+]
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=22.0.0",
+    "flake8>=5.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/ru4ls/ComfyUI_Qwen_Image"
+Repository = "https://github.com/ru4ls/ComfyUI_Qwen_Image"
+Issues = "https://github.com/ru4ls/ComfyUI_Qwen_Image/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["qwen_image*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --cov=qwen_image --cov-report=html --cov-report=term-missing"
+
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.coverage.run]
+source = ["qwen_image"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "setup.py"
+]

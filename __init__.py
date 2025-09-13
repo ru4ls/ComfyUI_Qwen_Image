@@ -3,7 +3,8 @@ ComfyUI_Qwen_Image - A custom node for ComfyUI that integrates Qwen-Image models
 for text-to-image and image-to-image editing.
 """
 
-from .qwen_image_nodes import QwenT2IGenerator, QwenI2IGenerator
+from .qwen_image.nodes.t2i_generator import QwenT2IGenerator
+from .qwen_image.nodes.i2i_editor import QwenI2IGenerator
 
 NODE_CLASS_MAPPINGS = {
     "QwenT2IGenerator": QwenT2IGenerator,
