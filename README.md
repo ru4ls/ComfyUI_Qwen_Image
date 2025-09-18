@@ -122,32 +122,6 @@ If you only provide `DASHSCOPE_API_KEY`, it will be used for both regions. If yo
 5. Execute the node
 6. The node outputs a text description of the image
 
-### Comprehensive Image Analysis with Qwen-Omni
-
-1. Add the "Qwen Omni Generator" node to your workflow
-2. Connect an image input
-3. Provide a detailed prompt for comprehensive analysis
-4. Select the Qwen-Omni model variant
-5. Execute the node
-6. The node outputs a comprehensive analysis of the image
-
-### Visual Question Answering with Qwen-QVQ
-
-1. Add the "Qwen QVQ Generator" node to your workflow
-2. Connect an image input
-3. Provide a specific question about the image
-4. Select the Qwen-QVQ model variant
-5. Execute the node
-6. The node outputs a detailed answer to your question
-
-### Optical Character Recognition with Qwen-OCR
-
-1. Add the "Qwen OCR Generator" node to your workflow
-2. Connect an image input containing text
-3. Select the Qwen-OCR model variant
-4. Execute the node
-5. The node outputs the extracted text from the image
-
 ## Node Parameters
 
 ### Text-to-Image Generator
