@@ -3,35 +3,37 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 
-A custom node for ComfyUI that provides **seamless integration** with the **Qwen-Image multimodal models** from **Alibaba Cloud Model Studio**. This solution delivers cutting-edge image generation and editing capabilities directly within ComfyUI.
+A custom node for ComfyUI that provides **seamless integration** with the **Qwen multimodal models** from **Alibaba Cloud Model Studio**. This solution delivers cutting-edge image generation, editing, and vision capabilities directly within ComfyUI.
 
 ### Why Choose Alibaba Cloud Model Studio?
 
 This is a direct integration with Alibaba Cloud's Model Studio service, not a third-party wrapper or local model implementation. Benefits include:
 
 - **Enterprise-Grade Infrastructure**: Leverages Alibaba Cloud's battle-tested AI platform serving millions of requests daily
-- **State-of-the-Art Models**: Access to the latest Qwen-Image models (qwen-image and qwen-image-edit) with continuous updates
+- **State-of-the-Art Models**: Access to the latest Qwen models (qwen-image, qwen-image-edit, qwen-vl-max, qwen-vl-plus) with continuous updates
 - **Commercial Licensing**: Properly licensed for commercial use through Alibaba Cloud's terms of service
 - **Scalable Architecture**: Handles high-volume workloads with Alibaba Cloud's reliable infrastructure
 - **Security Compliance**: Follows Alibaba Cloud's security best practices with secure API key management
 
 ## Important: API Costs & Authorization
 
-⚠️ **This is a paid service**: The Qwen-Image models are provided through Alibaba Cloud's commercial API and incur usage costs. You will be billed according to Alibaba Cloud's pricing model based on your usage.
+⚠️ **This is a paid service**: The Qwen models are provided through Alibaba Cloud's commercial API and incur usage costs. You will be billed according to Alibaba Cloud's pricing model based on your usage.
 
- **Model Authorization Required**: If you're using a non-default workspace or project in Alibaba Cloud, you may need to explicitly authorize access to the `qwen-image` and `qwen-image-edit` models in your DashScope console.
+ **Model Authorization Required**: If you're using a non-default workspace or project in Alibaba Cloud, you may need to explicitly authorize access to the models in your DashScope console.
 
 ## Features
 
-- Generate images from text T2I
-- Edit existing images based on text instructions I2I
+- Generate images from text (T2I)
+- Edit existing images based on text instructions (I2I)
+- Analyze and describe images using Qwen-VL models
+- Extract text from images using Qwen-OCR with specialized tasks
 - Configurable parameters: region, seed, resolution, prompt extension, watermark, negative prompts
-- Both nodes now return the image URL in addition to the image tensor
+- All nodes now return the image URL in addition to the image tensor
 - Support for both international and mainland China API endpoints
 - Support for separate API keys for different regions
-- Automatic environment region variable loading from config directory
+- Automatic environment variable loading from config directory
 - Industry-standard directory organization (core, config, generators)
-- Powered by Alibaba Cloud's advanced Qwen-Image models
+- Powered by Alibaba Cloud's advanced Qwen models
 
 ## Installation
 
@@ -60,7 +62,7 @@ This is a direct integration with Alibaba Cloud's Model Studio service, not a th
 If you're using a workspace other than your default workspace, you may need to authorize the models:
 
 1. Go to the [DashScope Model Management Console](https://dashscope.console.aliyun.com/model)
-2. Find `qwen-image` and `qwen-image-edit` models
+2. Find the models you want to use (`qwen-image`, `qwen-image-edit`, `qwen-vl-max`, `qwen-vl-plus`)
 3. Click "Authorize" or "Subscribe" for each model
 4. Select your workspace/project if prompted
 
@@ -111,6 +113,41 @@ If you only provide `DASHSCOPE_API_KEY`, it will be used for both regions. If yo
 4. Execute the node
 5. The node now outputs both the edited image and its URL
 
+### Image Analysis with Qwen-VL
+
+1. Add the "Qwen Vision-Language Generator" node to your workflow
+2. Connect an image input
+3. Provide a text prompt for analysis (e.g., "What is in this picture?")
+4. Select the Qwen-VL model (qwen-vl-max or qwen-vl-plus)
+5. Execute the node
+6. The node outputs a text description of the image
+
+### Comprehensive Image Analysis with Qwen-Omni
+
+1. Add the "Qwen Omni Generator" node to your workflow
+2. Connect an image input
+3. Provide a detailed prompt for comprehensive analysis
+4. Select the Qwen-Omni model variant
+5. Execute the node
+6. The node outputs a comprehensive analysis of the image
+
+### Visual Question Answering with Qwen-QVQ
+
+1. Add the "Qwen QVQ Generator" node to your workflow
+2. Connect an image input
+3. Provide a specific question about the image
+4. Select the Qwen-QVQ model variant
+5. Execute the node
+6. The node outputs a detailed answer to your question
+
+### Optical Character Recognition with Qwen-OCR
+
+1. Add the "Qwen OCR Generator" node to your workflow
+2. Connect an image input containing text
+3. Select the Qwen-OCR model variant
+4. Execute the node
+5. The node outputs the extracted text from the image
+
 ## Node Parameters
 
 ### Text-to-Image Generator
@@ -131,6 +168,13 @@ If you only provide `DASHSCOPE_API_KEY`, it will be used for both regions. If yo
 - **region**: Select API endpoint (international or mainland_china)
 - **Outputs**: IMAGE (tensor), URL (string)
 
+### Vision-Language Generator
+- **image** (required): Input image to analyze
+- **prompt** (required): Text prompt for image analysis
+- **model**: Select Qwen-VL model (qwen-vl-max, qwen-vl-plus, qwen-vl-max-latest, qwen-vl-plus-latest)
+- **region**: Select API endpoint (international or mainland_china)
+- **Outputs**: STRING (text description)
+
 ## Examples
 
 ### Text-only Generation
@@ -145,9 +189,34 @@ Edit an existing image:
 
 ![Image-to-Image Example](media/ComfyUI_Qwen_Image-i2i.png)
 
+### Image Analysis
+Analyze an image:
+- Image: a photo of a dog
+- Prompt: "What breed is this dog and what is it doing?"
+
 ## Security
 
 The API key is loaded from the `DASHSCOPE_API_KEY` environment variable and never stored in files or code, following Alibaba Cloud security best practices.
+
+## Changelog
+
+### v1.2.0
+- Added new Qwen-VL generator node for image understanding and description tasks
+- Supports qwen-vl-max, qwen-vl-plus, and latest model variants
+- Compatible with both international and mainland China API endpoints
+- Enhanced error handling with detailed error messages for common API issues
+- Added stream parameter support for potential future streaming capabilities
+
+### v1.1.0
+- Enhanced API error handling with specific error messages for common issues
+- Improved documentation and examples
+
+### v1.0.0
+- Initial release with core functionality
+- Text-to-Image generation with qwen-image model
+- Image-to-Image editing with qwen-image-edit model
+- Support for international and mainland China API endpoints
+- Configurable parameters for image generation and editing
 
 ## License
 
