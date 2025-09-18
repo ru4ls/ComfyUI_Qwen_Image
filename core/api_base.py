@@ -43,10 +43,16 @@ else:
 class QwenAPIBase:
     """Base class for Qwen API interactions"""
     
-    # API endpoints
+    # API endpoints for standard Qwen models
     ENDPOINTS = {
         "international": "https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation",
         "mainland_china": "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
+    }
+    
+    # OpenAI-compatible endpoints for Qwen-VL models
+    OPENAI_ENDPOINTS = {
+        "international": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
+        "mainland_china": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
     }
     
     def __init__(self):
@@ -75,6 +81,10 @@ class QwenAPIBase:
     def get_api_url(self, region="international"):
         """Get the appropriate API URL based on region"""
         return self.ENDPOINTS.get(region, self.ENDPOINTS["international"])
+    
+    def get_openai_api_url(self, region="international"):
+        """Get the appropriate OpenAI-compatible API URL based on region"""
+        return self.OPENAI_ENDPOINTS.get(region, self.OPENAI_ENDPOINTS["international"])
     
     def prepare_images(self, images):
         """Convert images to base64 strings for API submission"""

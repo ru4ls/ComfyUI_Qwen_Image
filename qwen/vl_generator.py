@@ -5,11 +5,20 @@ from PIL import Image
 import numpy as np
 import torch
 import io
+import base64
 
-class QwenI2IGenerator(QwenAPIBase):
+class QwenVLGenerator(QwenAPIBase):
     """
-    Node for image-to-image editing using Qwen-Image-Edit model
+    Node for Qwen-VL models (qwen-vl-max, qwen-vl-plus) 
+    for image understanding and description tasks
     """
+    
+    MODEL_OPTIONS = [
+        "qwen-vl-max",
+        "qwen-vl-plus",
+        "qwen-vl-max-latest",
+        "qwen-vl-plus-latest"
+    ]
     
     REGION_OPTIONS = [
         "international",
@@ -18,47 +27,45 @@ class QwenI2IGenerator(QwenAPIBase):
     
     def __init__(self):
         super().__init__()
-        self.model = "qwen-image-edit"  # Fixed model for this node
     
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "image": ("IMAGE",),
                 "prompt": ("STRING", {
                     "multiline": True,
-                    "default": "Edit this image"
+                    "default": "What is in this picture?"
                 }),
-                "image": ("IMAGE",),
+                "model": (cls.MODEL_OPTIONS, {
+                    "default": "qwen-vl-max"
+                }),
                 "region": (cls.REGION_OPTIONS, {
                     "default": "international"
                 })
             },
             "optional": {
-                "negative_prompt": ("STRING", {
-                    "multiline": True,
-                    "default": ""
-                }),
-                "watermark": ("BOOLEAN", {
+                "stream": ("BOOLEAN", {
                     "default": False
                 })
             }
         }
     
-    RETURN_TYPES = ("IMAGE", "STRING")
-    RETURN_NAMES = ("image", "url")
-    FUNCTION = "edit"
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("description",)
+    FUNCTION = "describe"
     CATEGORY = "Ru4ls/Qwen"
     
-    def edit(self, prompt, image, region, negative_prompt="", watermark=False):
+    def describe(self, image, prompt, model, region, stream=False):
         # Check API key based on region
         api_key = self.check_api_key(region)
         
-        # Get the appropriate API URL based on region
-        api_url = self.get_api_url(region)
+        # Using OpenAI-compatible endpoint for Qwen-VL models
+        api_url = self.get_openai_api_url(region)
         
         # Debug: Print API key status
         print(f"Using API key: {api_key[:8]}...{api_key[-4:]}")
-        print(f"Selected model: {self.model}")
+        print(f"Selected model: {model}")
         print(f"Using API endpoint: {api_url}")
         print(f"Selected region: {region}")
         
@@ -66,47 +73,43 @@ class QwenI2IGenerator(QwenAPIBase):
         image_data = self.prepare_images([image])
         image_base64 = image_data[0]["data"] if image_data else None
         
-        # Prepare API payload for image-to-image editing
-        # According to DashScope documentation, content should only contain image and text
-        content = [
-            {
-                "image": f"data:image/png;base64,{image_base64}"  # Add data URI prefix
-            },
-            {
-                "text": prompt
-            }
-        ]
+        # Prepare content for the message
+        content = []
+        if image_base64:
+            content.append({
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/png;base64,{image_base64}"
+                }
+            })
         
+        content.append({
+            "type": "text",
+            "text": prompt
+        })
+        
+        # Prepare API payload
         payload = {
-            "model": self.model,
-            "input": {
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": content
-                    }
-                ]
-            },
-            "parameters": {
-                "watermark": watermark
-            }
+            "model": model,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": content
+                }
+            ],
+            "stream": stream
         }
         
-        # Add optional parameters if they have non-default values
-        if negative_prompt:
-            payload["parameters"]["negative_prompt"] = negative_prompt
-        
-        # Set headers according to DashScope documentation
+        # Set headers for OpenAI-compatible API
         headers = {
             "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "X-DashScope-Async": "DISABLE"  # Ensure synchronous response
+            "Content-Type": "application/json"
         }
         
         # Debug: Print request details
-        print(f"Request headers: {{'Authorization': 'Bearer {api_key[:8]}...', 'Content-Type': 'application/json', 'X-DashScope-Async': 'DISABLE'}}")
+        print(f"Request headers: {{'Authorization': 'Bearer {api_key[:8]}...', 'Content-Type': 'application/json'}}")
         print(f"Request payload model: {payload['model']}")
-        print(f"Request payload prompt: {payload['input']['messages'][0]['content'][1]['text'][:100]}...")
+        print(f"Request payload prompt: {prompt[:100]}...")
         print(f"Has image data: {image_base64 is not None}")
         
         try:
@@ -122,25 +125,12 @@ class QwenI2IGenerator(QwenAPIBase):
             result = response.json()
             print(f"API response received: {json.dumps(result, indent=2)[:200]}...")  # Print first 200 chars
             
-            # Check if this is an image generation response
-            if "output" in result and "choices" in result["output"]:
-                choices = result["output"]["choices"]
-                if len(choices) > 0 and "message" in choices[0] and "content" in choices[0]["message"]:
-                    content = choices[0]["message"]["content"]
-                    if len(content) > 0 and "image" in content[0]:
-                        image_url = content[0]["image"]
-                        # Download the generated image
-                        image_response = requests.get(image_url)
-                        image_response.raise_for_status()
-                        
-                        # Convert to tensor
-                        image = Image.open(io.BytesIO(image_response.content))
-                        image_tensor = torch.from_numpy(np.array(image).astype(np.float32) / 255.0)
-                        image_tensor = image_tensor.unsqueeze(0)  # Add batch dimension
-                        
-                        return (image_tensor, image_url)
-                    else:
-                        raise ValueError(f"Unexpected API response format: {result}")
+            # Extract description from response
+            if "choices" in result and len(result["choices"]) > 0:
+                choice = result["choices"][0]
+                if "message" in choice and "content" in choice["message"]:
+                    description = choice["message"]["content"]
+                    return (description,)
                 else:
                     raise ValueError(f"Unexpected API response format: {result}")
             else:

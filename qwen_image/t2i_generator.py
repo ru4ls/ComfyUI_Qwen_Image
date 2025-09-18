@@ -64,7 +64,7 @@ class QwenT2IGenerator(QwenAPIBase):
     RETURN_TYPES = ("IMAGE", "STRING")
     RETURN_NAMES = ("image", "url")
     FUNCTION = "generate"
-    CATEGORY = "Ru4ls/QwenImage"
+    CATEGORY = "Ru4ls/Qwen"
     
     def generate(self, prompt, size, region, negative_prompt="", prompt_extend=True, watermark=False, seed=0):
         # Check API key based on region
