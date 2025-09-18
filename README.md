@@ -25,7 +25,6 @@ This is a direct integration with Alibaba Cloud's Model Studio service, not a th
 
 - Generate images from text T2I
 - Edit existing images based on text instructions I2I
-- Optional image masking for precise editing
 - Configurable parameters: region, seed, resolution, prompt extension, watermark, negative prompts
 - Both nodes now return the image URL in addition to the image tensor
 - Support for both international and mainland China API endpoints
@@ -109,9 +108,10 @@ If you only provide `DASHSCOPE_API_KEY`, it will be used for both regions. If yo
 1. Add the "Qwen Image-to-Image Editor" node to your workflow
 2. Connect an image input
 3. Provide a text instruction for editing and set region
-4. Optionally connect a mask image
-5. Execute the node
-6. The node now outputs both the edited image and its URL
+4. Execute the node
+5. The node now outputs both the edited image and its URL
+
+Note: Mask functionality has been removed as the DashScope qwen-image-edit API does not support masks in the content array.
 
 ## Node Parameters
 
@@ -128,11 +128,12 @@ If you only provide `DASHSCOPE_API_KEY`, it will be used for both regions. If yo
 ### Image-to-Image Editor
 - **prompt** (required): Text instruction for editing the image
 - **image** (required): Input image to edit
-- **mask_image** (optional): Mask defining areas to edit
 - **negative_prompt**: Text describing content to avoid in the edited image
 - **watermark**: Add Qwen-Image watermark to output
 - **region**: Select API endpoint (international or mainland_china)
 - **Outputs**: IMAGE (tensor), URL (string)
+
+Note: Mask functionality has been removed as the DashScope qwen-image-edit API does not support masks in the content array.
 
 ## Examples
 
@@ -141,10 +142,9 @@ Prompt: "Generate an image of a dog"
 
 ![Text-to-Image Example](media/ComfyUI_Qwen_Image-t2i.png)
 
-### Image Editing with Mask
-Edit an existing image by applying a mask to specify which areas to modify:
+### Image Editing
+Edit an existing image with a text instruction:
 - Original Image: an image of a dog
-- Mask: None
 - Prompt: "the dog is wearing a red t-shirt and a retro glasses while eating the hamburger"
 
 ![Image-to-Image Example](media/ComfyUI_Qwen_Image-i2i.png)
