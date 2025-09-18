@@ -110,11 +110,6 @@ If you only provide `DASHSCOPE_API_KEY`, it will be used for both regions. If yo
 3. Provide a text instruction for editing and set region
 4. Execute the node
 5. The node now outputs both the edited image and its URL
-<<<<<<< HEAD
-
-Note: Mask functionality has been removed as the DashScope qwen-image-edit API does not support masks in the content array.
-=======
->>>>>>> 516a3acf81971c261981731c2373f9a2b1b90b21
 
 ## Node Parameters
 
@@ -136,8 +131,6 @@ Note: Mask functionality has been removed as the DashScope qwen-image-edit API d
 - **region**: Select API endpoint (international or mainland_china)
 - **Outputs**: IMAGE (tensor), URL (string)
 
-Note: Mask functionality has been removed as the DashScope qwen-image-edit API does not support masks in the content array.
-
 ## Examples
 
 ### Text-only Generation
@@ -146,11 +139,7 @@ Prompt: "Generate an image of a dog"
 ![Text-to-Image Example](media/ComfyUI_Qwen_Image-t2i.png)
 
 ### Image Editing
-<<<<<<< HEAD
-Edit an existing image with a text instruction:
-=======
 Edit an existing image:
->>>>>>> 516a3acf81971c261981731c2373f9a2b1b90b21
 - Original Image: an image of a dog
 - Prompt: "the dog is wearing a red t-shirt and a retro glasses while eating the hamburger"
 
