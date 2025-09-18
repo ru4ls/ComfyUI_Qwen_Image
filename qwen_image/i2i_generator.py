@@ -7,7 +7,9 @@ import torch
 import io
 
 class QwenI2IGenerator(QwenAPIBase):
-    """Node for image-to-image editing using Qwen-Image-Edit model"""
+    """
+    Node for image-to-image editing using Qwen-Image-Edit model
+    """
     
     REGION_OPTIONS = [
         "international",
@@ -32,7 +34,6 @@ class QwenI2IGenerator(QwenAPIBase):
                 })
             },
             "optional": {
-                "mask_image": ("IMAGE",),
                 "negative_prompt": ("STRING", {
                     "multiline": True,
                     "default": ""
@@ -48,7 +49,7 @@ class QwenI2IGenerator(QwenAPIBase):
     FUNCTION = "edit"
     CATEGORY = "Ru4ls/QwenImage"
     
-    def edit(self, prompt, image, region, mask_image=None, negative_prompt="", watermark=False):
+    def edit(self, prompt, image, region, negative_prompt="", watermark=False):
         # Check API key based on region
         api_key = self.check_api_key(region)
         
@@ -66,6 +67,7 @@ class QwenI2IGenerator(QwenAPIBase):
         image_base64 = image_data[0]["data"] if image_data else None
         
         # Prepare API payload for image-to-image editing
+        # According to DashScope documentation, content should only contain image and text
         content = [
             {
                 "image": f"data:image/png;base64,{image_base64}"  # Add data URI prefix
@@ -74,15 +76,6 @@ class QwenI2IGenerator(QwenAPIBase):
                 "text": prompt
             }
         ]
-        
-        # Add mask if provided
-        if mask_image is not None:
-            mask_data = self.prepare_images([mask_image])
-            mask_base64 = mask_data[0]["data"] if mask_data else None
-            if mask_base64:
-                content.insert(1, {
-                    "mask": f"data:image/png;base64,{mask_base64}"  # Add mask data URI prefix
-                })
         
         payload = {
             "model": self.model,
@@ -111,11 +104,10 @@ class QwenI2IGenerator(QwenAPIBase):
         }
         
         # Debug: Print request details
-        print(f"Request headers: {{'Authorization': 'Bearer {self.api_key[:8]}...', 'Content-Type': 'application/json', 'X-DashScope-Async': 'DISABLE'}}")
+        print(f"Request headers: {{'Authorization': 'Bearer {api_key[:8]}...', 'Content-Type': 'application/json', 'X-DashScope-Async': 'DISABLE'}}")
         print(f"Request payload model: {payload['model']}")
         print(f"Request payload prompt: {payload['input']['messages'][0]['content'][1]['text'][:100]}...")
         print(f"Has image data: {image_base64 is not None}")
-        print(f"Has mask: {mask_image is not None}")
         
         try:
             # Make API request
