@@ -26,7 +26,6 @@ This is a direct integration with Alibaba Cloud's Model Studio service, not a th
 - Generate images from text (T2I)
 - Edit existing images based on text instructions (I2I)
 - Analyze and describe images using Qwen-VL models
-- Extract text from images using Qwen-OCR with specialized tasks
 - Configurable parameters: region, seed, resolution, prompt extension, watermark, negative prompts
 - All nodes now return the image URL in addition to the image tensor
 - Support for both international and mainland China API endpoints
