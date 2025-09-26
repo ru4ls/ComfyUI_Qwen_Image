@@ -25,6 +25,7 @@ This is a direct integration with Alibaba Cloud's Model Studio service, not a th
 
 - Generate images from text (T2I)
 - Edit existing images based on text instructions (I2I)
+- Multi-image editing support (up to 3 images for advanced editing workflows)
 - Analyze and describe images using Qwen-VL models
 - Configurable parameters: region, seed, resolution, prompt extension, watermark, negative prompts
 - All nodes now return the image URL in addition to the image tensor
@@ -107,7 +108,7 @@ If you only provide `DASHSCOPE_API_KEY`, it will be used for both regions. If yo
 ### Image-to-Image Editing
 
 1. Add the "Qwen Image-to-Image Editor" node to your workflow
-2. Connect an image input
+2. Connect one or more image inputs (image1 is required, image2 and image3 are optional)
 3. Provide a text instruction for editing and set region
 4. Execute the node
 5. The node now outputs both the edited image and its URL
@@ -135,7 +136,9 @@ If you only provide `DASHSCOPE_API_KEY`, it will be used for both regions. If yo
 
 ### Image-to-Image Editor
 - **prompt** (required): Text instruction for editing the image
-- **image** (required): Input image to edit
+- **image1** (required): Primary input image to edit
+- **image2** (optional): Secondary input image for multi-image editing
+- **image3** (optional): Tertiary input image for multi-image editing
 - **negative_prompt**: Text describing content to avoid in the edited image
 - **watermark**: Add Qwen-Image watermark to output
 - **region**: Select API endpoint (international or mainland_china)
@@ -162,6 +165,19 @@ Edit an existing image:
 
 ![Image-to-Image Example](media/ComfyUI_Qwen_Image-i2i.png)
 
+### Multi-Image Editing
+Combine multiple images for advanced editing:
+- Image1: an image of a room
+- Image2: an image showing a furniture style
+- Prompt: "Apply the furniture style from the second image to the room in the first image"
+- Result: A room with the furniture style applied
+
+- Image1: an image of a person
+- Image2: an image of a background scene
+- Image3: an image of an object to include
+- Prompt: "Place the person from the first image into the background scene with the object from the third image"
+- Result: A composite image with all elements combined
+
 ### Image Analysis
 Analyze an image:
 - Image: a photo of a dog
@@ -172,6 +188,13 @@ Analyze an image:
 The API key is loaded from the `DASHSCOPE_API_KEY` environment variable and never stored in files or code, following Alibaba Cloud security best practices.
 
 ## Changelog
+
+### v1.3.0
+- Enhanced Image-to-Image Editor with multi-image support (up to 3 images)
+- Added image2 and image3 optional inputs to the Qwen Image-to-Image Editor node
+- Updated API payload structure to support multi-image editing workflows
+- Improved content array handling to accommodate multiple input images
+- Enhanced debugging output to show number of image inputs
 
 ### v1.2.0
 - Added new Qwen-VL generator node for image understanding and description tasks

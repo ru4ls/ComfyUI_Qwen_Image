@@ -28,12 +28,14 @@ class QwenI2IGenerator(QwenAPIBase):
                     "multiline": True,
                     "default": "Edit this image"
                 }),
-                "image": ("IMAGE",),
+                "image1": ("IMAGE",),
                 "region": (cls.REGION_OPTIONS, {
                     "default": "international"
                 })
             },
             "optional": {
+                "image2": ("IMAGE",),
+                "image3": ("IMAGE",),
                 "negative_prompt": ("STRING", {
                     "multiline": True,
                     "default": ""
@@ -49,7 +51,7 @@ class QwenI2IGenerator(QwenAPIBase):
     FUNCTION = "edit"
     CATEGORY = "Ru4ls/Qwen"
     
-    def edit(self, prompt, image, region, negative_prompt="", watermark=False):
+    def edit(self, prompt, image1, region, image2=None, image3=None, negative_prompt="", watermark=False):
         # Check API key based on region
         api_key = self.check_api_key(region)
         
@@ -62,20 +64,28 @@ class QwenI2IGenerator(QwenAPIBase):
         print(f"Using API endpoint: {api_url}")
         print(f"Selected region: {region}")
         
-        # Prepare image data
-        image_data = self.prepare_images([image])
-        image_base64 = image_data[0]["data"] if image_data else None
+        # Prepare image data for all provided images
+        images_to_process = [img for img in [image1, image2, image3] if img is not None]
+        if not images_to_process:
+            raise ValueError("At least one image must be provided")
+        
+        image_data_list = self.prepare_images(images_to_process)
         
         # Prepare API payload for image-to-image editing
-        # According to DashScope documentation, content should only contain image and text
-        content = [
-            {
-                "image": f"data:image/png;base64,{image_base64}"  # Add data URI prefix
-            },
-            {
-                "text": prompt
-            }
-        ]
+        # According to DashScope documentation, content should contain all images and text
+        content = []
+        
+        # Add all image data to content
+        for img_data in image_data_list:
+            if img_data and "data" in img_data:
+                content.append({
+                    "image": f"data:image/png;base64,{img_data['data']}"  # Add data URI prefix
+                })
+        
+        # Add the text prompt to content
+        content.append({
+            "text": prompt
+        })
         
         payload = {
             "model": self.model,
@@ -106,8 +116,13 @@ class QwenI2IGenerator(QwenAPIBase):
         # Debug: Print request details
         print(f"Request headers: {{'Authorization': 'Bearer {api_key[:8]}...', 'Content-Type': 'application/json', 'X-DashScope-Async': 'DISABLE'}}")
         print(f"Request payload model: {payload['model']}")
-        print(f"Request payload prompt: {payload['input']['messages'][0]['content'][1]['text'][:100]}...")
-        print(f"Has image data: {image_base64 is not None}")
+        # Print the last text content (the prompt) for debugging
+        text_content = [item for item in payload['input']['messages'][0]['content'] if 'text' in item]
+        prompt_text = text_content[0]['text'] if text_content else "No text prompt found"
+        print(f"Request payload prompt: {prompt_text[:100]}...")
+        # Count the number of images in the request
+        image_count = len([item for item in payload['input']['messages'][0]['content'] if 'image' in item])
+        print(f"Number of image inputs: {image_count}")
         
         try:
             # Make API request
